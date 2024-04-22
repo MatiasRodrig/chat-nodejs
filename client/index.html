@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <script type="module">
+        // configurar socket
+
+        import { io } from "https://cdn.socket.io/4.3.2/socket.io.esm.min.js";
+
+        const socket = io({
+            auth: {
+                serverOffset: 0
+            }
+        });
+
+        // llamar al formulario
+
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const messages = document.getElementById('messages');
+
+
+        socket.on('chat message', (msg, serverOffset) => {
+            const item = `<li>${msg}</li>`;
+            messages.insertAdjacentHTML('beforeend', item);
+            socket.auth.serverOffset = serverOffset
+        });
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            if (input.value) {
+                socket.emit('chat message', input.value);
+                input.value = '';
+            }
+        });
+
+    </script>
+    <style>
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            color: #ccc;
+        }
+
+        :root {
+            color-scheme: light dark;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            display: grid;
+            place-content: center;
+            height: 100vh;
+            padding: 36px;
+            grid-template-rows: 1fr;
+        }
+
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow-y: scroll;
+            height: 100%;
+            scroll-behavior: smooth;
+            padding-bottom: 48px;
+        }
+
+        #messages>li {
+            padding: .5rem 1rem;
+        }
+
+        #messages>li:nth-child(odd) {
+            background: #000;
+        }
+
+
+
+        #chat {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 350px;
+            height: 100%;
+            position: relative;
+        }
+
+        #chat form {
+            margin-bottom: 36px;
+            margin-left: 20px;
+            margin-right: 20px;
+            display: flex;
+            justify-content: space-evenly;
+        }
+
+        input {
+            border-radius: 999px;
+            border: 1px solid #ccc;
+            padding: 8px 16px;
+            outline: none;
+        }
+
+        button {
+            border-radius: 999px;
+            border: 1px solid #ccc;
+            padding: 8px 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <section id="chat">
+        <ul id="messages"></ul>
+        <form id="form">
+            <input type="text" name="message" id="input" placeholder="Write your message here">
+            <button type="submit">Send</button>
+        </form>
+    </section>
+
+
+</body>
+
+</html>
